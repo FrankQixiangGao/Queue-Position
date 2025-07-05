@@ -24,7 +24,10 @@ pub struct OrderEvent {
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub enum Side { Bid, Ask }
+pub enum Side {
+    Bid,
+    Ask,
+}
 
 #[derive(Debug, Clone)]
 pub struct OrderEntry {
@@ -115,7 +118,6 @@ pub async fn start_pipeline() -> anyhow::Result<()> {
 async fn feed_reader(ring: Arc<ArrayQueue<OrderEvent>>) {
     let mut ts: u64 = 0;
     loop {
-        // TODO: pull bytes, parse ITCH/OUCH, etc.
         let ev = OrderEvent {
             ts,
             kind: EventKind::Add,
@@ -158,7 +160,6 @@ async fn strategy_loop(book: Arc<OrderBook>) {
         let p_fill = 1.0 - (-rate * horizon_ms).exp();
 
         if p_fill < p_min {
-            // --> send cancel / jump order via OUCH / FIX
             println!("🚨 consider jump: p_fill={:.2}% q_ahead={}", p_fill * 100.0, q_ahead);
         }
     }
